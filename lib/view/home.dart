@@ -27,7 +27,7 @@ class _HomepageState extends State<Homepage> {
     setState(() {});
   }
 
-  void startListening() async {
+  Future<void> startListening() async {
     await speechToText.listen(onResult: onSpeechResult);
     setState(() {});
   }
@@ -114,9 +114,11 @@ class _HomepageState extends State<Homepage> {
       floatingActionButton: FloatingActionButton.small(
         onPressed: () async {
           if (await speechToText.hasPermission && speechToText.isNotListening) {
-            startListening();
-          } else if (await speechToText.isListening) {
-            stopListening();
+            await startListening();
+          } else if (speechToText.isListening) {
+            await stopListening();
+          } else {
+            initSpeech();
           }
         },
         child: const Icon(Icons.mic),
