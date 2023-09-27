@@ -1,10 +1,53 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_voice_assistant/pallete.dart';
+import 'package:speech_to_text/speech_recognition_result.dart';
+import 'package:speech_to_text/speech_to_text.dart';
 
 import 'reuseable_wdget.dart';
 
-class Homepage extends StatelessWidget {
+class Homepage extends StatefulWidget {
   const Homepage({super.key});
+
+  @override
+  State<Homepage> createState() => _HomepageState();
+}
+
+class _HomepageState extends State<Homepage> {
+  SpeechToText speechToText = SpeechToText();
+  String lastWords = '';
+
+  @override
+  void initState() {
+    super.initState();
+    initSpeech();
+  }
+
+  Future<void> initSpeech() async {
+    await speechToText.initialize();
+    setState(() {});
+  }
+
+  void startListening() async {
+    await speechToText.listen(onResult: onSpeechResult);
+    setState(() {});
+  }
+
+  Future<void> stopListening() async {
+    await speechToText.stop();
+    setState(() {});
+  }
+
+  void onSpeechResult(SpeechRecognitionResult result) {
+    setState(() {
+      lastWords = result.recognizedWords;
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    speechToText.stop();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +112,13 @@ class Homepage extends StatelessWidget {
         ]),
       ),
       floatingActionButton: FloatingActionButton.small(
-        onPressed: () {},
+        onPressed: () async {
+          if (await speechToText.hasPermission && speechToText.isNotListening) {
+            startListening();
+          } else if (await speechToText.isListening) {
+            stopListening();
+          }
+        },
         child: const Icon(Icons.mic),
       ),
     );
