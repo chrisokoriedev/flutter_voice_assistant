@@ -66,6 +66,7 @@ class Homepage extends StatelessWidget {
           )
         ]),
       ),
+      floatingActionButton: FloatingActionButton.small(onPressed: (){},child: const Icon(Icons.mic),),
     );
   }
 }
